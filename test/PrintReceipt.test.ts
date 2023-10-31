@@ -37,20 +37,20 @@ Discounted prices：7.50(yuan)
     const expectedResult = [
       { item: 'ITEM000001', quantity: 1 },
       { item: 'ITEM000001', quantity: 1 },
-      { item: 'ITEM000003', quantity: '2.5' },
+      { item: 'ITEM000003', quantity: 2.5 },
       { item: 'ITEM000005', quantity: 1 },
-      { item: 'ITEM000005', quantity: '2' }
+      { item: 'ITEM000005', quantity: 2 }
     ]
     ;
     expect(generateTag(tags)).toEqual(expectedResult);
   });
   it('should generate receiptItem by tag', () => {
     const tags: Tag[] = [
-      { item: 'ITEM000001', quantity: '1' },
-      { item: 'ITEM000001', quantity: '1' },
-      { item: 'ITEM000003', quantity: '2.5' },
-      { item: 'ITEM000005', quantity: '1' },
-      { item: 'ITEM000005', quantity: '2' }
+      { item: 'ITEM000001', quantity: 1 },
+      { item: 'ITEM000001', quantity: 1 },
+      { item: 'ITEM000003', quantity: 2.5 },
+      { item: 'ITEM000005', quantity: 1 },
+      { item: 'ITEM000005', quantity: 2 }
     ];
     const expected = [
       {

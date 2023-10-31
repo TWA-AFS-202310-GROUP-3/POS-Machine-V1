@@ -10,5 +10,5 @@ export interface ReceiptItem {
 
 export interface Tag {
 	item: string;
-	quantity: string
+	quantity: number
 }

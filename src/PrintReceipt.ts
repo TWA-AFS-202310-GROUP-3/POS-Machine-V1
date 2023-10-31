@@ -1,4 +1,4 @@
-import { checkPromotionsExist, getItemByBarCode } from './Dependencies';
+import { checkPromotionsExist, getItemByBarCode, loadAllItems } from './Dependencies';
 import { ReceiptItem, Tag } from './Receipt.type';
 
 export function printReceipt(tags: string[]): string {
@@ -8,14 +8,14 @@ export function printReceipt(tags: string[]): string {
   const renderedList = renderReceiptList(receiptionList);
   let total = 0;
   let discount = 0;
-  receiptionList.forEach( item => total+=item.subtotal);
-  receiptionList.forEach( item => discount+=item.discount);
+  receiptionList.forEach(item => total += item.subtotal);
+  receiptionList.forEach(item => discount += item.discount);
   return `***<store earning no money>Receipt ***
 ${renderedList}
 ----------------------
 Total：${total.toFixed(2)}(yuan)
 Discounted prices：${discount.toFixed(2)}(yuan)
-**********************`
+**********************`;
 }
 
 
@@ -25,7 +25,7 @@ export function generateTag(rawItemList: string[]) {
 }
 
 function renderReceiptList(receiptItems: ReceiptItem[]): string {
-  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}${item.quantity>1?'s':''}，Unit：${item.unitPrice.toFixed(2)}(yuan)，Subtotal：${item.subtotal.toFixed(2)}(yuan)`).join('\n');
+  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}${item.quantity > 1 ? 's' : ''}，Unit：${item.unitPrice.toFixed(2)}(yuan)，Subtotal：${item.subtotal.toFixed(2)}(yuan)`).join('\n');
 }
 
 export function parseTag(tags: string[]): Tag[] {
@@ -34,7 +34,7 @@ export function parseTag(tags: string[]): Tag[] {
     if (isValidBarcode(tags)) {
       return {
         item: tags[0],
-        quantity: tags[1] ?? 1
+        quantity: Number.isNaN(Number(tags[1])) ? 1 : Number(tags[1])
       } as Tag;
     } else {
       throw new Error('Invalid');
@@ -92,33 +92,30 @@ function calculateItemSubtotal(receiptItems: ReceiptItem[]): ReceiptItem[] {
 }
 
 function isValidBarcode(parsedTag: string[]): boolean {
-  return isValidItemCode(parsedTag[0]) && isValidQuantity(parsedTag);
+  return parsedTag.length <= 2 && isValidItemCode(parsedTag[0]) && isValidQuantity(parsedTag);
 }
 
 function isValidQuantity(parsedTag: string[]): boolean {
   const barcode = parsedTag[0];
   if (parsedTag.length === 1) return true;
   const quantity = Number(parsedTag[1]);
-  if (!Number.isNaN(quantity)) {
+  if (Number.isNaN(quantity)) {
+    return false;
+  } else {
     if (getItemByBarCode(barcode)?.unit !== 'pound') {
       return Number.isInteger(quantity);
     }
     return true;
   }
-  return false;
-
 }
 
 function isValidItemCode(itemCode: string): boolean {
-  if (getItemByBarCode(itemCode)) {
-    return true;
-  }
-  return false;
+  const items = loadAllItems();
+  return items.findIndex(item => item.barcode === itemCode) > -1;
 }
 
 function parseQuantity(tag: string): string[] {
-  const tags = tag.split('-');
-  return tags;
+  return tag.split('-');
 }
 
 
