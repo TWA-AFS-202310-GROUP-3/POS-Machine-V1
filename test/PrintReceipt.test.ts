@@ -1,4 +1,5 @@
-import { generateTag, printReceipt } from '../src/PrintReceipt';
+import { generateReceiptItems, generateTag, printReceipt } from '../src/PrintReceipt';
+import { Tag } from '../src/Receipt.type';
 
 
 describe('printReceipt', () => {
@@ -42,5 +43,44 @@ Discounted prices：7.50(yuan)
     ]
     ;
     expect(generateTag(tags)).toEqual(expectedResult);
+  });
+  it('should generate receiptItem by tag', () => {
+    const tags: Tag[] = [
+      { item: 'ITEM000001', quantity: '1' },
+      { item: 'ITEM000001', quantity: '1' },
+      { item: 'ITEM000003', quantity: '2.5' },
+      { item: 'ITEM000005', quantity: '1' },
+      { item: 'ITEM000005', quantity: '2' }
+    ];
+    const expected = [
+      {
+        name: 'Sprite',
+        barcode: 'ITEM000001',
+        quantity: 2,
+        unitPrice: 3,
+        unit: 'bottle',
+        discount: 0,
+        subtotal: 6
+      },
+      {
+        name: 'Litchi',
+        barcode: 'ITEM000003',
+        quantity: 2.5,
+        unitPrice: 15,
+        unit: 'pound',
+        discount: 0,
+        subtotal: 37.5
+      },
+      {
+        name: 'Instant Noodles',
+        barcode: 'ITEM000005',
+        quantity: 3,
+        unitPrice: 4.5,
+        unit: 'bag',
+        discount: 4.5,
+        subtotal: 9
+      }
+    ];
+    expect(generateReceiptItems(tags)).toEqual(expected);
   });
 });
