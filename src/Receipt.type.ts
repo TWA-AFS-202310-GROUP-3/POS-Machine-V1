@@ -1,10 +1,8 @@
-export interface ItemQuantity {
-	value: number,
-	unit: string
-}
 export interface ReceiptItem {
 	name: string;
-	quantity: ItemQuantity,
+	barcode: string;
+	quantity: number,
+	unit: string;
 	unitPrice: number,
 	subtotal: number,
 	discount: number
