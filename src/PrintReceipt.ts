@@ -62,7 +62,7 @@ function parseOneTag(tag: string): Tag | null{
 
 }
 
-// function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
+//function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
 
 //   const uniqueParsedTags
 //   return uniqueParsedTags
@@ -80,10 +80,30 @@ function parseTags(tags: string[]): Tag[] | null{
   return parsedTags
 }
 
+
 function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
-  const receiptItems:ReceiptItem[] = []
+
+  const allItems = loadAllItems()
+  const promotions = loadPromotions()
+
+  function generateReceiptItem(tag: Tag):ReceiptItem{
+    const discount = 0
+    const itemInfo = allItems.find((item) => item.barcode === tag.barcode)
+
+    const receiptItem: ReceiptItem ={
+      name: tag.barcode,
+      quantity: {value:tag.quantity, quantifier:itemInfo?.unit},
+      unitPrice: itemInfo?.price,
+      subtotal: tag.quantity * itemInfo.price - discount,
+      discountedPrice: discount
+    }
+    return receiptItem
+  }
+  const receiptItems = tags.map(tag => generateReceiptItem(tag))
   return receiptItems
 }
+
+
 
 function renderReceipt(receiptItems: ReceiptItem[]): string{
   let receipt = '***<store earning no money>Receipt ***' + '\n'
