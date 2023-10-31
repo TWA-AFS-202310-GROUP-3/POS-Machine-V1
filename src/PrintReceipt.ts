@@ -13,13 +13,15 @@ Discounted prices：7.50(yuan)
 }
 
 
+
+
 export function generateTag(rawItemList: string[]) {
   console.log(parseTag(rawItemList));
   return parseTag(rawItemList);
 }
 
 function renderReceipt(receiptItems: ReceiptItem[]): string {
-  return '';
+  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}，Unit：${item.unitPrice}(yuan)，Subtotal：${item.subtotal}(yuan), Discount: ${item.discount}`).join('\n');
 }
 
 export function parseTag(tags: string[]): Tag[] {
