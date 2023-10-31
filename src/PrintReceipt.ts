@@ -61,6 +61,13 @@ function parseOneTag(tag: string): Tag | null{
   }
 
 }
+
+// function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
+
+//   const uniqueParsedTags
+//   return uniqueParsedTags
+// }
+
 function parseTags(tags: string[]): Tag[] | null{
   const parsedTags:Tag[] =[]
   for(const tag in tags){
@@ -74,8 +81,20 @@ function parseTags(tags: string[]): Tag[] | null{
 }
 
 function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
+  const receiptItems:ReceiptItem[] = []
   return receiptItems
 }
+
 function renderReceipt(receiptItems: ReceiptItem[]): string{
+  let receipt = '***<store earning no money>Receipt ***' + '\n'
+  const itemList = receiptItems.map(item =>
+    `Name: ${item.name}, Quantity: ${item.quantity.value} ${item.quantity.quantifier}, Unit: ${item.unitPrice}(yuan), Subtotal: ${item.subtotal}(yuan)`
+  ).join('\n')
+  receipt += itemList
+  receipt+=`
+  ----------------------
+  Tota: 21.00(yuan)
+  Discounted price: 4.00(yuan)
+  **********************`
   return receipt
 }
