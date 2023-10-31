@@ -6,15 +6,16 @@ export function printReceipt(tags: string[]): string {
   const generatedTag: Tag[] = generateTag(tags);
   const receiptionList: ReceiptItem[] = generateReceiptItems(generatedTag);
   const renderedList = renderReceiptList(receiptionList);
-  const prefix = "***<store earning no money>Receipt ***";
   let total = 0;
   let discount = 0;
   receiptionList.forEach( item => total+=item.subtotal);
   receiptionList.forEach( item => discount+=item.discount);
-  const suffix = `Total：${total}\n Discounted priced:${discount}(yuan)`;
-  const finalResult = prefix.concat('\n').concat(renderedList).concat('\n').concat(suffix).concat('\n').concat(`**********************`);
-  console.log(finalResult);
-  return finalResult;
+  return `***<store earning no money>Receipt ***
+${renderedList}
+----------------------
+Total：${total.toFixed(2)}(yuan)
+Discounted prices：${discount.toFixed(2)}(yuan)
+**********************`
 }
 
 
@@ -24,7 +25,7 @@ export function generateTag(rawItemList: string[]) {
 }
 
 function renderReceiptList(receiptItems: ReceiptItem[]): string {
-  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}，Unit：${item.unitPrice}(yuan)，Subtotal：${item.subtotal}(yuan)`).join('\n');
+  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}${item.quantity>1?'s':''}，Unit：${item.unitPrice.toFixed(2)}(yuan)，Subtotal：${item.subtotal.toFixed(2)}(yuan)`).join('\n');
 }
 
 export function parseTag(tags: string[]): Tag[] {
