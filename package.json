@@ -11,12 +11,14 @@
   "keywords": [],
   "scripts": {
     "test": "jest",
+    "test c": "jest --collect-coverage",
     "test:watch": "jest --watch",
     "lint": "eslint src test",
     "fix": "eslint src test --fix",
     "compile": "tsc",
     "prepare": "npm run compile",
     "start":"ts-node src/PrintReceipt.ts"
+
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",

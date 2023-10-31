@@ -1,18 +1,18 @@
 import {loadAllItems, loadPromotions} from './Dependencies'
 
-interface Product {
+export interface Product {
       barcode: string,
       name: string,
       unit: string,
       price: number
 }
 
-interface Tag {
+export interface Tag {
   barcode : string,
   quantity: number
 }
 
-interface ReceiptItem {
+export interface ReceiptItem {
   name : string,
   unit: string,
   quantity : number,
@@ -40,9 +40,9 @@ export function printReceipt(tags: string[]): string {
   result += render(receiptItems)
 
   // console.log(allproducts);
-  // console.log(parsedTags)
+  console.log(parsedTags)
   // console.log(receiptItems)
-
+  // console.log(promotionCodes)
   // console.log(result)
 
 //     return `***<store earning no money>Receipt ***
@@ -56,7 +56,8 @@ export function printReceipt(tags: string[]): string {
   return result;
 }
 
-function render(receiptItems: ReceiptItem[]) {
+export function render(receiptItems: ReceiptItem[]) {
+  // console.log(receiptItems)
   let result = `***<store earning no money>Receipt ***\n`
   let total = 0
   let discounted = 0
@@ -74,7 +75,7 @@ function render(receiptItems: ReceiptItem[]) {
   return result;
 }
 
-function generateReceiptItems(parsedTags : Tag[], receiptItems: ReceiptItem[]) {
+export function generateReceiptItems(parsedTags : Tag[], receiptItems: ReceiptItem[]) {
   // interface ReceiptItem {
   //   name : string,
   //   unit: string,
@@ -116,7 +117,7 @@ function generateReceiptItems(parsedTags : Tag[], receiptItems: ReceiptItem[]) {
   
 }
 
-function loadProductsAndPromotionCodes(allproducts : Product[], promotionCodes : string[]) {
+export function loadProductsAndPromotionCodes(allproducts : Product[], promotionCodes : string[]) {
   const loadedItems = loadAllItems()
   loadedItems.forEach(item => {
     allproducts.push(item)
@@ -127,10 +128,9 @@ function loadProductsAndPromotionCodes(allproducts : Product[], promotionCodes :
   loadedPromotionCodes.forEach(code => {
     promotionCodes.push(code)
   })
-  
 }
 
-function parseTags(tags : string[], parsedTags : Tag[]) {
+export function parseTags(tags : string[], parsedTags : Tag[]) {
   tags.forEach(tag => {
     if (!isCodeValid(tag)) {
       throw new Error(`The tag ${tag} is invalid, Program terminate abnormally!`)
@@ -139,7 +139,7 @@ function parseTags(tags : string[], parsedTags : Tag[]) {
   })
 }
 
-function isCodeValid(code : string) : boolean {
+export function isCodeValid(code : string) : boolean {
   if (code === '') return false
   const found = allproducts.find((product) => {
     return code.indexOf(product.barcode) === 0
@@ -148,7 +148,7 @@ function isCodeValid(code : string) : boolean {
   return false
 }
 
-function insertTag(tag : string, parsedTags : Tag[]) {
+export function insertTag(tag : string, parsedTags : Tag[]) {
   const found = parsedTags.find((theTag) => {
     return tag.includes(theTag.barcode)
   })
