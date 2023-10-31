@@ -84,6 +84,8 @@ Discounted prices：4.00(yuan)
 # Practice Requirement
 
 1. Please draw the whole tasking diagram.
+   ![image](https://github.com/jingwang315/POS-Machine-V1/assets/148844919/13854db9-abe9-450b-8f15-0d3d8e598ae6)
+
 2. Please declare all the functions according to your diagram.
 3. Please write a test case following given...when...then pattern for a leaf
    block of the diagram. Then implement the block to pass the test.
