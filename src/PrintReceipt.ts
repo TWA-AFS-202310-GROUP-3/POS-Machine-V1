@@ -2,17 +2,20 @@ import { checkPromotionsExist, getItemByBarCode } from './Dependencies';
 import { ReceiptItem, Tag } from './Receipt.type';
 
 export function printReceipt(tags: string[]): string {
-  return `***<store earning no money>Receipt ***
-Name：Sprite，Quantity：5 bottles，Unit：3.00(yuan)，Subtotal：12.00(yuan)
-Name：Litchi，Quantity：2.5 pounds，Unit：15.00(yuan)，Subtotal：37.50(yuan)
-Name：Instant Noodles，Quantity：3 bags，Unit：4.50(yuan)，Subtotal：9.00(yuan)
-----------------------
-Total：58.50(yuan)
-Discounted prices：7.50(yuan)
-**********************`;
+
+  const generatedTag: Tag[] = generateTag(tags);
+  const receiptionList: ReceiptItem[] = generateReceiptItems(generatedTag);
+  const renderedList = renderReceiptList(receiptionList);
+  const prefix = "***<store earning no money>Receipt ***";
+  let total = 0;
+  let discount = 0;
+  receiptionList.forEach( item => total+=item.subtotal);
+  receiptionList.forEach( item => discount+=item.discount);
+  const suffix = `Total：${total}\n Discounted priced:${discount}(yuan)`;
+  const finalResult = prefix.concat('\n').concat(renderedList).concat('\n').concat(suffix).concat('\n').concat(`**********************`);
+  console.log(finalResult);
+  return finalResult;
 }
-
-
 
 
 export function generateTag(rawItemList: string[]) {
@@ -20,8 +23,8 @@ export function generateTag(rawItemList: string[]) {
   return parseTag(rawItemList);
 }
 
-function renderReceipt(receiptItems: ReceiptItem[]): string {
-  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}，Unit：${item.unitPrice}(yuan)，Subtotal：${item.subtotal}(yuan), Discount: ${item.discount}`).join('\n');
+function renderReceiptList(receiptItems: ReceiptItem[]): string {
+  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}，Unit：${item.unitPrice}(yuan)，Subtotal：${item.subtotal}(yuan)`).join('\n');
 }
 
 export function parseTag(tags: string[]): Tag[] {
