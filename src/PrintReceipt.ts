@@ -1,12 +1,52 @@
 import {loadAllItems, loadPromotions} from './Dependencies'
+export interface Quantity{
+  value: number;
+  quantifier: string
+}
+
+interface ReceiptItem{
+  name: string;
+  quantity: Quantity;
+  unitPrice: number;
+  subtotal: number;
+  discountedPrice: number
+}
+
+interface Tag{
+  barcode: string;
+  quantity: number
+}
 
 export function printReceipt(tags: string[]): string {
-  return `***<store earning no money>Receipt ***
-Name：Sprite，Quantity：5 bottles，Unit：3.00(yuan)，Subtotal：12.00(yuan)
-Name：Litchi，Quantity：2.5 pounds，Unit：15.00(yuan)，Subtotal：37.50(yuan)
-Name：Instant Noodles，Quantity：3 bags，Unit：4.50(yuan)，Subtotal：9.00(yuan)
-----------------------
-Total：58.50(yuan)
-Discounted prices：7.50(yuan)
-**********************`
+
+  const parsedTags = parseTags(tags)
+  const receiptItems = generateReceiptItems(parsedTags)
+  const receipt = renderReceipt(receiptItems)
+  return receipt
+}
+
+function parseQuantity(tag: string): number
+{
+
+}
+function parseTags(tags: string[]): Tag[]
+{
+  const parsedTags:Tag[] =[]
+  for(const tag in tags){
+    const quantity = parseQuantity(tag)
+    const parsedTag:Tag={
+      barcode: tag.slice(0,10),
+      quantity: quantity
+    }
+    parsedTags.push(parsedTag)
+  }
+  return parsedTags
+}
+
+function generateReceiptItems(tags: Tag[]): ReceiptItem[]
+{
+  return receiptItems
+}
+function renderReceipt(receiptItems: ReceiptItem[]): string{
+  return receipt
 }
