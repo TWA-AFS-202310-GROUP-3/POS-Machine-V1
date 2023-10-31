@@ -103,18 +103,23 @@ function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
   return receiptItems
 }
 
-
-
 function renderReceipt(receiptItems: ReceiptItem[]): string{
   let receipt = '***<store earning no money>Receipt ***' + '\n'
   const itemList = receiptItems.map(item =>
     `Name: ${item.name}, Quantity: ${item.quantity.value} ${item.quantity.quantifier}, Unit: ${item.unitPrice}(yuan), Subtotal: ${item.subtotal}(yuan)`
   ).join('\n')
   receipt += itemList
+
+  let total = 0
+  let discountedPrice = 0
+  receiptItems.forEach((item)=>{
+    total+=item.subtotal
+    discountedPrice += item.discountedPrice
+  })
   receipt+=`
   ----------------------
-  Tota: 21.00(yuan)
-  Discounted price: 4.00(yuan)
+  Total: ${total}(yuan)
+  Discounted price: ${discountedPrice}(yuan)
   **********************`
   return receipt
 }
