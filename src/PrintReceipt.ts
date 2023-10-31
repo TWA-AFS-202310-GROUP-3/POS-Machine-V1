@@ -20,31 +20,60 @@ interface Tag{
 export function printReceipt(tags: string[]): string {
 
   const parsedTags = parseTags(tags)
+  if(parsedTags === null){
+    return 'Tags are invalid, please check it!'
+  }
   const receiptItems = generateReceiptItems(parsedTags)
   const receipt = renderReceipt(receiptItems)
   return receipt
 }
 
-function parseQuantity(tag: string): number
-{
+function isTagValid(parsedTag: Tag): boolean{
+
+  return true
+  // if(parsedTag.barcode in )
+  // barcode: tag.slice(0,10),
+  // quantity: quantity
+}
+
+function parseOneTag(tag: string): Tag | null{
+  let parsedTag:Tag
+  if(tag.includes('-')){
+    const splitTag:string[] = tag.split('-')
+    parsedTag = {
+      barcode: splitTag[0],
+      quantity: parseInt(splitTag[1])
+    }
+
+  }
+  else{
+    parsedTag = {
+      barcode: tag,
+      quantity: 1
+    }
+  }
+
+  if(isTagValid(parsedTag)){
+    return parsedTag
+  }
+  else{
+    return null
+  }
 
 }
-function parseTags(tags: string[]): Tag[]
-{
+function parseTags(tags: string[]): Tag[] | null{
   const parsedTags:Tag[] =[]
   for(const tag in tags){
-    const quantity = parseQuantity(tag)
-    const parsedTag:Tag={
-      barcode: tag.slice(0,10),
-      quantity: quantity
+    const parsedTag = parseOneTag(tag)
+    if(parsedTag === null){
+      return null
     }
     parsedTags.push(parsedTag)
   }
   return parsedTags
 }
 
-function generateReceiptItems(tags: Tag[]): ReceiptItem[]
-{
+function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
   return receiptItems
 }
 function renderReceipt(receiptItems: ReceiptItem[]): string{
