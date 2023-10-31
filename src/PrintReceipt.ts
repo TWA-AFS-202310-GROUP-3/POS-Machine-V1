@@ -107,8 +107,8 @@ function generateReceiptItems(parsedTags : Tag[], receiptItems: ReceiptItem[]) {
     if (foundDiscount) {
       discount = Math.floor(receiptItem.quantity / 3) * receiptItem.price;
     }
-    console.log(receiptItem.quantity / 3)
-    console.log('discount' + discount)
+    // console.log(receiptItem.quantity / 3)
+    // console.log('discount' + discount)
 
     receiptItem.discountedPrice = receiptItem.subtotal - discount;
     receiptItems.push(receiptItem)
