@@ -1,12 +1,121 @@
-import {loadAllItems, loadPromotions} from './Dependencies'
+import { checkPromotionsExist, getItemByBarCode, loadAllItems } from './Dependencies';
+import { ReceiptItem, Tag } from './Receipt.type';
 
 export function printReceipt(tags: string[]): string {
+
+  const generatedTag: Tag[] = generateTag(tags);
+  const receiptionList: ReceiptItem[] = generateReceiptItems(generatedTag);
+  const renderedList = renderReceiptList(receiptionList);
+  let total = 0;
+  let discount = 0;
+  receiptionList.forEach(item => total += item.subtotal);
+  receiptionList.forEach(item => discount += item.discount);
   return `***<store earning no money>Receipt ***
-Name：Sprite，Quantity：5 bottles，Unit：3.00(yuan)，Subtotal：12.00(yuan)
-Name：Litchi，Quantity：2.5 pounds，Unit：15.00(yuan)，Subtotal：37.50(yuan)
-Name：Instant Noodles，Quantity：3 bags，Unit：4.50(yuan)，Subtotal：9.00(yuan)
+${renderedList}
 ----------------------
-Total：58.50(yuan)
-Discounted prices：7.50(yuan)
-**********************`
+Total：${total.toFixed(2)}(yuan)
+Discounted prices：${discount.toFixed(2)}(yuan)
+**********************`;
 }
+
+
+export function generateTag(rawItemList: string[]) {
+  console.log(parseTag(rawItemList));
+  return parseTag(rawItemList);
+}
+
+function renderReceiptList(receiptItems: ReceiptItem[]): string {
+  return receiptItems.map(item => `Name：${item.name}，Quantity：${item.quantity} ${item.unit}${item.quantity > 1 ? 's' : ''}，Unit：${item.unitPrice.toFixed(2)}(yuan)，Subtotal：${item.subtotal.toFixed(2)}(yuan)`).join('\n');
+}
+
+export function parseTag(tags: string[]): Tag[] {
+  const parsedTags: string[][] = tags.map(tag => parseQuantity(tag));
+  return parsedTags.map(tags => {
+    if (isValidBarcode(tags)) {
+      return {
+        item: tags[0],
+        quantity: Number.isNaN(Number(tags[1])) ? 1 : Number(tags[1])
+      } as Tag;
+    } else {
+      throw new Error('Invalid');
+    }
+  });
+}
+
+export function generateReceiptItems(tags: Tag[]): ReceiptItem[] {
+  const receiptItems: ReceiptItem[] = transferTagToReceiptItem(tags);
+  const itemsWithDiscount: ReceiptItem[] = calculateDiscount(receiptItems);
+  const finalReceiptItems: ReceiptItem[] = calculateItemSubtotal(itemsWithDiscount);
+  console.log(finalReceiptItems);
+  return receiptItems;
+}
+
+function transferTagToReceiptItem(tags: Tag[]): ReceiptItem[] {
+  const receiptItems: ReceiptItem[] = [];
+
+  tags.forEach(tag => {
+    const addedItem = receiptItems.find(item => item.barcode === tag.item);
+    if (addedItem) {
+      addedItem.quantity += Number(tag.quantity);
+    } else {
+      const item = getItemByBarCode(tag.item);
+      if (item) {
+        receiptItems.push({
+          name: item.name,
+          barcode: item.barcode,
+          quantity: Number(tag.quantity),
+          unitPrice: item.price,
+          unit: item.unit,
+          discount: 0,
+          subtotal: 0
+        });
+      }
+    }
+  });
+  return receiptItems;
+}
+
+function calculateDiscount(receiptItems: ReceiptItem[]): ReceiptItem[] {
+  return receiptItems.map(receiptItem => {
+    if (checkPromotionsExist(receiptItem.barcode)) {
+      receiptItem.discount = receiptItem.unitPrice * Math.floor(receiptItem.quantity / 3);
+    }
+    return receiptItem;
+  });
+}
+
+function calculateItemSubtotal(receiptItems: ReceiptItem[]): ReceiptItem[] {
+  return receiptItems.map(receiptItem => {
+    receiptItem.subtotal = receiptItem.quantity * receiptItem.unitPrice - receiptItem.discount;
+    return receiptItem;
+  });
+}
+
+function isValidBarcode(parsedTag: string[]): boolean {
+  return parsedTag.length <= 2 && isValidItemCode(parsedTag[0]) && isValidQuantity(parsedTag);
+}
+
+function isValidQuantity(parsedTag: string[]): boolean {
+  const barcode = parsedTag[0];
+  if (parsedTag.length === 1) return true;
+  const quantity = Number(parsedTag[1]);
+  if (Number.isNaN(quantity)) {
+    return false;
+  } else {
+    if (getItemByBarCode(barcode)?.unit !== 'pound') {
+      return Number.isInteger(quantity);
+    }
+    return true;
+  }
+}
+
+function isValidItemCode(itemCode: string): boolean {
+  const items = loadAllItems();
+  return items.findIndex(item => item.barcode === itemCode) > -1;
+}
+
+function parseQuantity(tag: string): string[] {
+  return tag.split('-');
+}
+
+

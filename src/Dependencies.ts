@@ -36,7 +36,7 @@ export function loadAllItems() {
       unit: 'bag',
       price: 4.50
     }
-  ]
+  ];
 }
 
 export function loadPromotions() {
@@ -49,5 +49,15 @@ export function loadPromotions() {
         'ITEM000005'
       ]
     }
-  ]
+  ];
+}
+
+export function getItemByBarCode(barcode: string) {
+  const items = loadAllItems();
+  return items.find(item => item.barcode === barcode);
+}
+
+export function checkPromotionsExist(barcode: string) {
+  const promotions = loadPromotions();
+  return promotions.findIndex(promotion => promotion.barcodes.find(code => code === barcode)) > -1;
 }
