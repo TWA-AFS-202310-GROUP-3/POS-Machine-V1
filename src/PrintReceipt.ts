@@ -17,6 +17,18 @@ interface Tag{
   quantity: number
 }
 
+interface Item{
+  barcode: string;
+  name: string;
+  unit: string;
+  price: number;
+}
+
+interface Promotion{
+  type: string;
+  barcodes: string[];
+}
+
 export function printReceipt(tags: string[]): string {
 
   const parsedTags = parseTags(tags)
@@ -28,21 +40,29 @@ export function printReceipt(tags: string[]): string {
   return receipt
 }
 
-function isTagValid(parsedTag: Tag): boolean{
+function isTagValid(parsedTag: Tag, allItems: Item[], barcodeOfItemNotSoldInUnit: string[]): boolean{
 
-  return true
-  // if(parsedTag.barcode in )
-  // barcode: tag.slice(0,10),
-  // quantity: quantity
+  if(allItems.find((item) => item.barcode === parsedTag.barcode) === null){
+    return false
+  }
+  else if(barcodeOfItemNotSoldInUnit.indexOf(parsedTag.barcode)===-1 && Math.ceil(parsedTag.quantity) !== parsedTag.quantity){
+    return false
+  }
+  else{
+    return true
+  }
 }
 
 function parseOneTag(tag: string): Tag | null{
   let parsedTag:Tag
+  const allItems = loadAllItems()
+  const barcodeOfItemNotSoldInUnit: string[] = ['ITEM000002', 'ITEM000003']
+
   if(tag.includes('-')){
     const splitTag:string[] = tag.split('-')
     parsedTag = {
       barcode: splitTag[0],
-      quantity: parseInt(splitTag[1])
+      quantity: Number(splitTag[1])
     }
 
   }
@@ -53,7 +73,7 @@ function parseOneTag(tag: string): Tag | null{
     }
   }
 
-  if(isTagValid(parsedTag)){
+  if(isTagValid(parsedTag, allItems, barcodeOfItemNotSoldInUnit)){
     return parsedTag
   }
   else{
@@ -82,8 +102,8 @@ function parseTags(tags: string[]): Tag[] | null{
 
 function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
 
-  const allItems = loadAllItems()
-  const promotions = loadPromotions()
+  const allItems: Item[] = loadAllItems()
+  const promotions: Promotion[] = loadPromotions()
 
   function generateReceiptItem(tag: Tag):ReceiptItem{
     const discount = 0
