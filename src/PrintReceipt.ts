@@ -31,26 +31,26 @@ interface Promotion{
 
 export function printReceipt(tags: string[]): string {
 
-  const parsedTags = parseTags(tags)
-  if(parsedTags === null){
+  const uniqueParsedTags = parseTags(tags)
+  if(uniqueParsedTags === null){
     return 'Tags are invalid, please check it!'
   }
-  const receiptItems = generateReceiptItems(parsedTags)
+  const receiptItems = generateReceiptItems(uniqueParsedTags)
   const receipt = renderReceipt(receiptItems)
   return receipt
 }
 
-function isTagValid(parsedTag: Tag, allItems: Item[], barcodeOfItemNotSoldInUnit: string[]): boolean{
-
-  if(allItems.find((item) => item.barcode === parsedTag.barcode) === null){
-    return false
+function parseTags(tags: string[]): Tag[] | null{
+  const parsedTags:Tag[] =[]
+  for(const tag in tags){
+    const parsedTag = parseOneTag(tag)
+    if(parsedTag === null){
+      return null
+    }
+    parsedTags.push(parsedTag)
   }
-  else if(barcodeOfItemNotSoldInUnit.indexOf(parsedTag.barcode)===-1 && Math.ceil(parsedTag.quantity) !== parsedTag.quantity){
-    return false
-  }
-  else{
-    return true
-  }
+  const uniqueParsedTags = generateUniqueParsedTags(parsedTags)
+  return uniqueParsedTags
 }
 
 function parseOneTag(tag: string): Tag | null{
@@ -81,8 +81,20 @@ function parseOneTag(tag: string): Tag | null{
   }
 }
 
-function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
+function isTagValid(parsedTag: Tag, allItems: Item[], barcodeOfItemNotSoldInUnit: string[]): boolean{
 
+  if(allItems.find((item) => item.barcode === parsedTag.barcode) === null){
+    return false
+  }
+  else if(barcodeOfItemNotSoldInUnit.indexOf(parsedTag.barcode)===-1 && Math.ceil(parsedTag.quantity) !== parsedTag.quantity){
+    return false
+  }
+  else{
+    return true
+  }
+}
+
+function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
   const uniqueParsedTags: Tag[] = []
   for(const i in parsedTags){
     if(uniqueParsedTags.find((item)=> item.barcode === parsedTags[i].barcode) === null){
@@ -100,39 +112,31 @@ function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
   return uniqueParsedTags
 }
 
-function parseTags(tags: string[]): Tag[] | null{
-  const parsedTags:Tag[] =[]
-  for(const tag in tags){
-    const parsedTag = parseOneTag(tag)
-    if(parsedTag === null){
-      return null
-    }
-    parsedTags.push(parsedTag)
-  }
-  return parsedTags
-}
-
 
 function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
-
   const allItems: Item[] = loadAllItems()
   const promotions: Promotion[] = loadPromotions()
-
-  function generateReceiptItem(tag: Tag):ReceiptItem{
-    const discount = 0
-    const itemInfo = allItems.find((item) => item.barcode === tag.barcode)
-
-    const receiptItem: ReceiptItem ={
-      name: tag.barcode,
-      quantity: {value:tag.quantity, quantifier:itemInfo!.unit},
-      unitPrice: itemInfo!.price,
-      subtotal: tag.quantity * itemInfo!.price - discount,
-      discountedPrice: discount
-    }
-    return receiptItem
-  }
-  const receiptItems = tags.map(tag => generateReceiptItem(tag))
+  const receiptItems = tags.map(tag => generateReceiptItem(tag, allItems, promotions))
   return receiptItems
+}
+
+function generateReceiptItem(tag: Tag, allItems: Item[], promotions: Promotion[]):ReceiptItem{
+  const discount = 0
+  for(const j in promotions){
+    if(promotions[j].barcodes.indexOf(tag.barcode) > -1){
+      tag.quantity = tag.quantity % 3 + 2 * tag.quantity/3|0
+    }
+  }
+  const itemInfo = allItems.find((item) => item.barcode === tag.barcode)
+
+  const receiptItem: ReceiptItem ={
+    name: tag.barcode,
+    quantity: {value:tag.quantity, quantifier:itemInfo!.unit},
+    unitPrice: itemInfo!.price,
+    subtotal: tag.quantity * itemInfo!.price - discount,
+    discountedPrice: discount
+  }
+  return receiptItem
 }
 
 function renderReceipt(receiptItems: ReceiptItem[]): string{
