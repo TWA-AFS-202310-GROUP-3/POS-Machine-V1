@@ -59,7 +59,6 @@ function parseOneTag(tag: string): Tag | null{
   else{
     return null
   }
-
 }
 
 //function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
@@ -92,9 +91,9 @@ function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
 
     const receiptItem: ReceiptItem ={
       name: tag.barcode,
-      quantity: {value:tag.quantity, quantifier:itemInfo?.unit},
-      unitPrice: itemInfo?.price,
-      subtotal: tag.quantity * itemInfo.price - discount,
+      quantity: {value:tag.quantity, quantifier:itemInfo!.unit},
+      unitPrice: itemInfo!.price,
+      subtotal: tag.quantity * itemInfo!.price - discount,
       discountedPrice: discount
     }
     return receiptItem
