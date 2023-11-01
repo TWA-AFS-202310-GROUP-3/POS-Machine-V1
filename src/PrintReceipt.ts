@@ -72,7 +72,6 @@ function parseOneTag(tag: string): Tag | null{
       quantity: 1
     }
   }
-
   if(isTagValid(parsedTag, allItems, barcodeOfItemNotSoldInUnit)){
     return parsedTag
   }
@@ -159,3 +158,4 @@ function renderReceipt(receiptItems: ReceiptItem[]): string{
   **********************`
   return receipt
 }
+
