@@ -81,11 +81,24 @@ function parseOneTag(tag: string): Tag | null{
   }
 }
 
-//function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
+function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
 
-//   const uniqueParsedTags
-//   return uniqueParsedTags
-// }
+  const uniqueParsedTags: Tag[] = []
+  for(const i in parsedTags){
+    if(uniqueParsedTags.find((item)=> item.barcode === parsedTags[i].barcode) === null){
+      uniqueParsedTags.push({barcode: parsedTags[i].barcode, quantity: 0})
+    }
+    uniqueParsedTags.map(item =>{
+      if(item.barcode === parsedTags[i].barcode){
+        return item.quantity + parsedTags[i].quantity
+      }
+      else{
+        return item
+      }
+    })
+  }
+  return uniqueParsedTags
+}
 
 function parseTags(tags: string[]): Tag[] | null{
   const parsedTags:Tag[] =[]
