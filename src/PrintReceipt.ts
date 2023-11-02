@@ -42,7 +42,7 @@ export function printReceipt(tags: string[]): string {
 
 function parseTags(tags: string[]): Tag[] | null{
   const parsedTags:Tag[] =[]
-  for(const tag in tags){
+  for(const tag of tags){
     const parsedTag = parseOneTag(tag)
     if(parsedTag === null){
       return null
@@ -96,12 +96,13 @@ function isTagValid(parsedTag: Tag, allItems: Item[], barcodeOfItemNotSoldInUnit
 function generateUniqueParsedTags(parsedTags: Tag[]): Tag[]{
   const uniqueParsedTags: Tag[] = []
   for(const i in parsedTags){
-    if(uniqueParsedTags.find((item)=> item.barcode === parsedTags[i].barcode) === null){
+    if(uniqueParsedTags.find((item)=> item.barcode === parsedTags[i].barcode) === undefined){
       uniqueParsedTags.push({barcode: parsedTags[i].barcode, quantity: 0})
     }
     uniqueParsedTags.map(item =>{
       if(item.barcode === parsedTags[i].barcode){
-        return item.quantity + parsedTags[i].quantity
+        item.quantity += parsedTags[i].quantity
+        return item
       }
       else{
         return item
@@ -120,19 +121,24 @@ function generateReceiptItems(tags: Tag[]): ReceiptItem[]{
 }
 
 function generateReceiptItem(tag: Tag, allItems: Item[], promotions: Promotion[]):ReceiptItem{
-  const discount = 0
-  for(const j in promotions){
-    if(promotions[j].barcodes.indexOf(tag.barcode) > -1){
-      tag.quantity = tag.quantity % 3 + 2 * tag.quantity/3|0
-    }
-  }
+  let discount = 0
+  let discountQ = tag.quantity
   const itemInfo = allItems.find((item) => item.barcode === tag.barcode)
 
+  for(const j in promotions){
+    if(promotions[j].barcodes.indexOf(tag.barcode) > -1){
+      // tag.quantity =
+      const less = Math.floor(tag.quantity / 3)
+      discountQ = tag.quantity  - less
+      discount = itemInfo!.price * less
+    }
+  }
+
   const receiptItem: ReceiptItem ={
-    name: tag.barcode,
+    name: itemInfo!.name,
     quantity: {value:tag.quantity, quantifier:itemInfo!.unit},
     unitPrice: itemInfo!.price,
-    subtotal: tag.quantity * itemInfo!.price - discount,
+    subtotal: discountQ * itemInfo!.price,
     discountedPrice: discount
   }
   return receiptItem
@@ -141,7 +147,7 @@ function generateReceiptItem(tag: Tag, allItems: Item[], promotions: Promotion[]
 function renderReceipt(receiptItems: ReceiptItem[]): string{
   let receipt = '***<store earning no money>Receipt ***' + '\n'
   const itemList = receiptItems.map(item =>
-    `Name: ${item.name}, Quantity: ${item.quantity.value} ${item.quantity.quantifier}, Unit: ${item.unitPrice}(yuan), Subtotal: ${item.subtotal}(yuan)`
+    `Name：${item.name}，Quantity：${item.quantity.value} ${item.quantity.quantifier}s，Unit：${item.unitPrice.toFixed(2)}(yuan)，Subtotal：${item.subtotal.toFixed(2)}(yuan)`
   ).join('\n')
   receipt += itemList
 
@@ -152,10 +158,10 @@ function renderReceipt(receiptItems: ReceiptItem[]): string{
     discountedPrice += item.discountedPrice
   })
   receipt+=`
-  ----------------------
-  Total: ${total}(yuan)
-  Discounted price: ${discountedPrice}(yuan)
-  **********************`
+----------------------
+Total：${total.toFixed(2)}(yuan)
+Discounted prices：${discountedPrice.toFixed(2)}(yuan)
+**********************`
   return receipt
 }
 

@@ -21,6 +21,6 @@ Total：58.50(yuan)
 Discounted prices：7.50(yuan)
 **********************`
 
-    expect(expectText).toEqual(expectText)
+    expect(printReceipt(tags)).toEqual(expectText)
   })
 })
