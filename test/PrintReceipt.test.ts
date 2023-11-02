@@ -1,5 +1,4 @@
-import {printReceipt} from '../src/PrintReceipt'
-
+import { printReceipt } from '../src/PrintReceipt'
 describe('printReceipt', () => {
   it('should print receipt with promotion when print receipt', () => {
     const tags = [
@@ -10,7 +9,7 @@ describe('printReceipt', () => {
       'ITEM000001',
       'ITEM000003-2.5',
       'ITEM000005',
-      'ITEM000005-2',
+      'ITEM000005-2'
     ]
 
     const expectText = `***<store earning no money>Receipt ***
